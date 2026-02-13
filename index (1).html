@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Meter - Compatibility Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float 15s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 107, 157, 0.2);
+            border: 2px solid #ff6b9d;
+            color: #ff6b9d;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 107, 157, 0.3);
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: #ff6b9d;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #c06c84;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .description {
+            background: rgba(255, 107, 157, 0.1);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #ffc2d4;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        footer p {
+            margin: 0.3rem 0;
+        }
+
+        .heart-small {
+            color: #ff6b9d;
+        }
+
+        .input-section {
+            margin: 2rem 0;
+        }
+
+        .person {
+            margin: 1.5rem 0;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ffc2d4;
+            border-radius: 15px;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .name-input:focus {
+            outline: none;
+            border-color: #ff6b9d;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ffc2d4;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #ff6b9d;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+        }
+
+        .date-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+        }
+
+        .date-input::-webkit-datetime-edit-fields-wrapper {
+            padding: 0;
+        }
+
+        .date-input::-webkit-datetime-edit {
+            padding: 0;
+        }
+
+        .date-input::-webkit-datetime-edit-text {
+            padding: 0 0.3em;
+        }
+
+        .heart-divider {
+            font-size: 2rem;
+            color: #ff6b9d;
+            margin: 1rem 0;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(45deg, #ff6b9d, #f67280);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.6);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .percentage-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d, #f67280);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.5);
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .percentage-inner {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .percentage-number {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #ff6b9d;
+        }
+
+        .percentage-sign {
+            font-size: 2rem;
+            color: #c06c84;
+        }
+
+        .result-message {
+            font-size: 1.5rem;
+            color: #ff6b9d;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .result-description {
+            color: #666;
+            line-height: 1.6;
+            font-size: 1rem;
+            padding: 0 1rem;
+        }
+
+        .try-again-btn {
+            background: white;
+            color: #ff6b9d;
+            border: 2px solid #ff6b9d;
+            padding: 0.8rem 2rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .try-again-btn:hover {
+            background: #ff6b9d;
+            color: white;
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .percentage-circle {
+                width: 160px;
+                height: 160px;
+            }
+
+            .percentage-inner {
+                width: 140px;
+                height: 140px;
+            }
+
+            .percentage-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts-bg" id="heartsContainer"></div>
+
+    <div class="container">
+        <div class="language-toggle">
+            <button class="lang-btn" id="langBtn">日本語</button>
+        </div>
+        
+        <h1>💕 Love Meter 💕</h1>
+        <p class="subtitle">Discover your compatibility!</p>
+
+        <div class="description" id="description">
+            Enter your name and birthday along with your crush's details to discover your love compatibility! Our Love Meter uses a special algorithm to calculate how well you match together based on your birthdays.
+        </div>
+
+        <div class="input-section" id="inputSection">
+            <div class="person">
+                <label>Your Name</label>
+                <input type="text" class="name-input" id="name1" placeholder="Enter your name">
+                <label style="margin-top: 0.5rem;">Your Birthday (MM/DD/YYYY)</label>
+                <input type="text" class="date-input" id="date1" placeholder="Enter your birthday" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+            </div>
+
+            <div class="heart-divider">❤️</div>
+
+            <div class="person">
+                <label>Your Crush's Name</label>
+                <input type="text" class="name-input" id="name2" placeholder="Enter their name">
+                <label style="margin-top: 0.5rem;">Their Birthday (MM/DD/YYYY)</label>
+                <input type="text" class="date-input" id="date2" placeholder="Enter their birthday" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+            </div>
+
+            <button class="calculate-btn" onclick="calculateLove()">Calculate Love! 💖</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="percentage-circle">
+                <div class="percentage-inner">
+                    <div>
+                        <span class="percentage-number" id="percentage">0</span>
+                        <span class="percentage-sign">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="emoji" id="emoji">💕</div>
+            <div class="result-message" id="resultMessage"></div>
+            <div class="result-description" id="resultDescription"></div>
+
+            <button class="try-again-btn" onclick="resetCalculator()">Try Again</button>
+        </div>
+
+        <footer id="footer">
+            <p>Made with <span class="heart-small">❤️</span> for fun!</p>
+            <p>This is just for entertainment purposes.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                title: "💕 Love Meter 💕",
+                subtitle: "Discover your compatibility!",
+                description: "Enter your name and birthday along with your crush's details to discover your love compatibility! Our Love Meter uses a special algorithm to calculate how well you match together based on your birthdays.",
+                yourName: "Your Name",
+                enterYourName: "Enter your name",
+                yourBirthday: "Your Birthday (MM/DD/YYYY)",
+                enterYourBirthday: "Enter your birthday",
+                crushName: "Your Crush's Name",
+                enterTheirName: "Enter their name",
+                theirBirthday: "Their Birthday (MM/DD/YYYY)",
+                enterTheirBirthday: "Enter their birthday",
+                calculateBtn: "Calculate Love! 💖",
+                tryAgainBtn: "Try Again",
+                fillAllFields: "Please fill in all fields! 💝",
+                footerMade: "Made with",
+                footerFun: "for fun!",
+                footerDisclaimer: "This is just for entertainment purposes.",
+                perfectMatch: "Perfect Match!",
+                perfectMatchDesc: "are made for each other! Your connection is incredibly strong and magical. The stars are aligned for you two! 🌟",
+                greatCompat: "Great Compatibility!",
+                greatCompatDesc: "have wonderful chemistry! There's definitely something special here. Keep nurturing this connection! 💫",
+                goodPotential: "Good Potential!",
+                goodPotentialDesc: "have a decent match! With effort and understanding, this could blossom into something beautiful. Give it time! 🌸",
+                friendsForever: "Friends Forever!",
+                friendsForeverDesc: "might be better as friends! Sometimes the best relationships are built on friendship first. Who knows what the future holds! 🌈"
+            },
+            ja: {
+                title: "💕 ラブメーター 💕",
+                subtitle: "あなたの相性を発見しましょう！",
+                description: "あなたの名前と誕生日、そして好きな人の情報を入力して、恋愛相性を発見しましょう！私たちのラブメーターは、誕生日に基づいて特別なアルゴリズムを使用してあなたたちがどれだけマッチしているかを計算します。",
+                yourName: "あなたの名前",
+                enterYourName: "名前を入力してください",
+                yourBirthday: "あなたの誕生日 (MM/DD/YYYY)",
+                enterYourBirthday: "誕生日を入力してください",
+                crushName: "好きな人の名前",
+                enterTheirName: "相手の名前を入力してください",
+                theirBirthday: "相手の誕生日 (MM/DD/YYYY)",
+                enterTheirBirthday: "誕生日を入力してください",
+                calculateBtn: "相性を測る！ 💖",
+                tryAgainBtn: "もう一度",
+                fillAllFields: "すべての項目を入力してください！ 💝",
+                footerMade: "愛を込めて",
+                footerFun: "作成しました！",
+                footerDisclaimer: "これはエンターテイメント目的のみです。",
+                perfectMatch: "完璧な相性！",
+                perfectMatchDesc: "はお互いに運命の相手です！あなたたちの絆は信じられないほど強く魔法のようです。星があなたたち二人のために並んでいます！🌟",
+                greatCompat: "素晴らしい相性！",
+                greatCompatDesc: "は素晴らしいケミストリーを持っています！ここには確実に特別な何かがあります。この関係を大切に育てましょう！💫",
+                goodPotential: "良い可能性！",
+                goodPotentialDesc: "はまずまずの相性です！努力と理解によって、美しい関係に花開く可能性があります。時間をかけましょう！🌸",
+                friendsForever: "永遠の友達！",
+                friendsForeverDesc: "は友達として最高かもしれません！時には最高の関係は友情から始まるものです。未来に何が待っているか誰にもわかりません！🌈"
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Create floating hearts
+        function createHearts() {
+            const container = document.getElementById('heartsContainer');
+            const heartSymbols = ['💕', '💖', '💗', '💓', '💝', '❤️', '💘'];
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        createHearts();
+
+        // Language toggle
+        document.getElementById('langBtn').addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'ja' : 'en';
+            updateLanguage();
+        });
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            
+            // Update button text
+            document.getElementById('langBtn').textContent = currentLang === 'en' ? '日本語' : 'English';
+            
+            // Update title and subtitle
+            document.querySelector('h1').textContent = t.title;
+            document.querySelector('.subtitle').textContent = t.subtitle;
+            
+            // Update description
+            document.getElementById('description').textContent = t.description;
+            
+            // Update labels
+            const labels = document.querySelectorAll('label');
+            labels[0].textContent = t.yourName;
+            labels[1].textContent = t.yourBirthday;
+            labels[2].textContent = t.crushName;
+            labels[3].textContent = t.theirBirthday;
+            
+            // Update placeholders
+            document.getElementById('name1').placeholder = t.enterYourName;
+            document.getElementById('name2').placeholder = t.enterTheirName;
+            document.getElementById('date1').placeholder = t.enterYourBirthday;
+            document.getElementById('date2').placeholder = t.enterTheirBirthday;
+            
+            // Update buttons
+            document.querySelector('.calculate-btn').textContent = t.calculateBtn;
+            document.querySelector('.try-again-btn').textContent = t.tryAgainBtn;
+            
+            // Update footer
+            document.getElementById('footer').innerHTML = `
+                <p>${t.footerMade} <span class="heart-small">❤️</span> ${t.footerFun}</p>
+                <p>${t.footerDisclaimer}</p>
+            `;
+        }
+
+        function calculateLove() {
+            const t = translations[currentLang];
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+            const date1 = document.getElementById('date1').value;
+            const date2 = document.getElementById('date2').value;
+
+            if (!name1 || !name2 || !date1 || !date2) {
+                alert(t.fillAllFields);
+                return;
+            }
+
+            // Hide input section and show result section
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+
+            // Calculate compatibility percentage
+            const percentage = getCompatibilityPercentage(date1, date2, name1, name2);
+            
+            // Animate the percentage
+            animatePercentage(percentage);
+
+            // Show result message and description
+            showResult(percentage, name1, name2);
+        }
+
+        function getCompatibilityPercentage(date1, date2, name1, name2) {
+            // Convert dates to numbers
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            
+            // Create a "unique" seed from the dates and names
+            const seed = Math.abs(
+                d1.getDate() + d1.getMonth() + d1.getFullYear() +
+                d2.getDate() + d2.getMonth() + d2.getFullYear() +
+                name1.length + name2.length
+            );
+            
+            // Generate a pseudo-random but consistent percentage (40-99%)
+            const percentage = 40 + (seed % 60);
+            
+            return percentage;
+        }
+
+        function animatePercentage(targetPercentage) {
+            const percentageEl = document.getElementById('percentage');
+            let currentPercentage = 0;
+            const increment = Math.ceil(targetPercentage / 50);
+            
+            const interval = setInterval(() => {
+                currentPercentage += increment;
+                if (currentPercentage >= targetPercentage) {
+                    currentPercentage = targetPercentage;
+                    clearInterval(interval);
+                }
+                percentageEl.textContent = currentPercentage;
+            }, 30);
+        }
+
+        function showResult(percentage, name1, name2) {
+            const t = translations[currentLang];
+            const emojiEl = document.getElementById('emoji');
+            const messageEl = document.getElementById('resultMessage');
+            const descriptionEl = document.getElementById('resultDescription');
+
+            let emoji, message, description;
+
+            if (percentage >= 80) {
+                emoji = '😍💖✨';
+                message = t.perfectMatch;
+                description = `${name1} ${currentLang === 'ja' ? 'と' : 'and'} ${name2} ${t.perfectMatchDesc}`;
+            } else if (percentage >= 60) {
+                emoji = '💕😊';
+                message = t.greatCompat;
+                description = `${name1} ${currentLang === 'ja' ? 'と' : 'and'} ${name2} ${t.greatCompatDesc}`;
+            } else if (percentage >= 40) {
+                emoji = '💛🤔';
+                message = t.goodPotential;
+                description = `${name1} ${currentLang === 'ja' ? 'と' : 'and'} ${name2} ${t.goodPotentialDesc}`;
+            } else {
+                emoji = '💚😌';
+                message = t.friendsForever;
+                description = `${name1} ${currentLang === 'ja' ? 'と' : 'and'} ${name2} ${t.friendsForeverDesc}`;
+            }
+
+            emojiEl.textContent = emoji;
+            messageEl.textContent = message;
+            descriptionEl.textContent = description;
+        }
+
+        function resetCalculator() {
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('name1').value = '';
+            document.getElementById('name2').value = '';
+            document.getElementById('date1').value = '';
+            document.getElementById('date2').value = '';
+        }
+    </script>
+</body>
+</html>
